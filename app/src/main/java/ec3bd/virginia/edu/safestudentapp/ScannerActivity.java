@@ -15,8 +15,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.zxing.Result;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +34,7 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
     private String scanner_name;
     private double latitude = 0;
     private double longitude = 0;
+    private ImageView image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +81,11 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
         Log.e("handler", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode)
 
         // show the scanner result into dialog box.
-        ImageView image = new ImageView(this);
+        image = new ImageView(this);
         //Test for success
-        image.setImageResource(R.drawable.check);
+        this.student_id = rawResult.getText();
+        this.sendData();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(image);
         //builder.setMessage(rawResult.getText());
@@ -97,10 +105,10 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
         },750L);
 
         // Get the student id
-        this.student_id = rawResult.getText();
+
 
         //Send data through to server
-        this.sendData();
+
     }
 
     public void sendData() {
@@ -110,13 +118,29 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
         final String lat = ""+this.latitude;
         final String lon = ""+this.longitude;
         final String student_id = this.student_id;
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
+        Map<String, String>  params = new HashMap<String, String>();
+        params.put("uuid", student_id);
+        params.put("scanner_name", name);
+        params.put("latitude", lat);
+        params.put("longitude", lon);
+        JSONObject json = new JSONObject(params);
+        Log.d("json", json.toString());
+        CustomRequest postRequest = new CustomRequest(Request.Method.POST, url, params,
+                new Response.Listener<JSONObject>()
                 {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         // response
-                        Log.d("Response", response);
+                        Log.d("resp", response.toString());
+                        try {
+                            String status = response.getString("status");
+                            Log.d("status",status);
+                            if (status.equals("success"))
+                                image.setImageResource(R.drawable.check);
+                            else
+                                image.setImageResource(R.drawable.x_icon);
+                        }catch (JSONException e){}
+                        //Log.d("Response", response);
                     }
                 },
                 new Response.ErrorListener()
@@ -128,17 +152,17 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
                     }
                 }
         ) {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("uuid", student_id);
-                params.put("scanner_name", name);
-                params.put("latitude", lat);
-                params.put("longitude", lon);
-
-                return params;
-            }
+//            @Override
+//            protected JSONObject getParams()
+//            {
+//                Map<String, String>  params = new HashMap<String, String>();
+//                params.put("uuid", student_id);
+//                params.put("scanner_name", name);
+//                params.put("latitude", lat);
+//                params.put("longitude", lon);
+//                JSONObject json = new JSONObject(params);
+//                return json;
+//            }
         };
         queue.add(postRequest);
     }
