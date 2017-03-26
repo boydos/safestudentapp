@@ -1,6 +1,7 @@
 package ec3bd.virginia.edu.safestudentapp;
 
 import android.content.Context;
+import android.hardware.Camera;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
@@ -39,17 +41,6 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-
-        String provider = locationManager.getBestProvider(criteria, false);
-
-        Location location = locationManager.getLastKnownLocation(provider);
-
-        this.latitude = location.getLatitude();
-        this.longitude = location.getLongitude();
     }
 
     public void QrScanner(View view){
@@ -58,13 +49,26 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
         setContentView(mScannerView);
 
         mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();         // Start camera
+        int backCameraId = -1, frontCameraId = -1;
+        for(int i=0;i< Camera.getNumberOfCameras();i++){
+            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+            Camera.getCameraInfo(i,cameraInfo);
+            if(cameraInfo.facing== Camera.CameraInfo.CAMERA_FACING_BACK) {
+                backCameraId = i;
+            }
+            if(cameraInfo.facing== Camera.CameraInfo.CAMERA_FACING_FRONT){
+                frontCameraId = i;
+            }
+        }
+        int camera = backCameraId;
+        if(backCameraId == -1)
+            camera = frontCameraId;
+        mScannerView.startCamera(camera);     // Start camera
 
-        EditText name = (EditText) findViewById(R.id.name);
+        LayoutInflater factory = getLayoutInflater();
+        View mainText = factory.inflate(R.layout.activity_main, null);
+        EditText name = (EditText) mainText.findViewById(R.id.name);
         this.scanner_name = name.getText().toString();
-
-
-
     }
 
     @Override
@@ -97,12 +101,28 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
         // If you would like to resume scanning, call this method below:
         mScannerView.resumeCameraPreview(this);
 
+        // Get the student id
         this.student_id = rawResult.getText();
+
+        //Grabbing the location
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+        Criteria criteria = new Criteria();
+
+        String provider = locationManager.getBestProvider(criteria, false);
+
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+
+        //Send data through to server
+        this.postData();
     }
 
     public void postData() {
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("localhost:8000/api/v1/event/create");
+        HttpPost httpPost = new HttpPost("safestudent.herokuapp.com/api/v1/event/create");
 
         try {
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
@@ -112,7 +132,12 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
             nameValuePairs.add(new BasicNameValuePair("longitude", ""+this.longitude));
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-            HttpResponse respopnse = httpClient.execute(httpPost);
+            HttpResponse response = httpClient.execute(httpPost);
+
+            if(response.getStatusLine().toString() != "success") {
+                new AlertDialog.Builder(this).setTitle("POST Error").setMessage("Data was not sent through!");
+
+            }
         } catch (ClientProtocolException e){
             // TODO Auto-generated catch block
         } catch (IOException e) {
