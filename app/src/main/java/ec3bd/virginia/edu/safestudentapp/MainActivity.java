@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
 
         display = ((WindowManager) getSystemService(WINDOW_SERVICE))
                 .getDefaultDisplay();
-        int orientation = display.getOrientation();
+        orientation = display.getOrientation();
     }
 
     public void QrScanner(View view){
@@ -64,7 +64,8 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
         if(mScannerView != null && orientation == orientation_) { //if you're in the scannerview and the pause isn't due to a orientation change, quit
             mScannerView.stopCamera();           // Stop camera on pause
             setContentView(R.layout.activity_main);
-        }
+        }else if(orientation != orientation_)//mScannerView != null)
+            mScannerView.resumeCameraPreview(this);
     }
 //    @Override
 //    public void onResume() {
@@ -99,15 +100,9 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
             @Override
             public void run() {
                 mScannerView.resumeCameraPreview(thisproxy);
-            }
-        },250L);
-        Handler alertHandler = new Handler();
-        alertHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
                 alert1.dismiss();
             }
-        },1000L);
+        },750L);
 
     }
 
