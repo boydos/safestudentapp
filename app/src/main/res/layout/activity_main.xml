@@ -8,6 +8,20 @@
     tools:layout_editor_absoluteY="81dp"
     tools:layout_editor_absoluteX="0dp">
 
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/map"
+        android:layout_width="239dp"
+        android:layout_height="143dp"
+        tools:layout_editor_absoluteY="154dp"
+        tools:layout_editor_absoluteX="73dp" />
+    <meta-data
+        android:name="com.google.android.maps.v2.API_KEY"
+        android:value="AIzaSyCnf19lYWo203P3zDrDvdBh10rU66tWcF8"
+        android:layout_height="0dp"
+        android:layout_width="0dp"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Button
         android:id="@+id/button"
@@ -52,11 +66,10 @@
             android:layout_height="wrap_content"
             android:text="Enter a name for the scanner"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginLeft="76dp"
+            android:layout_marginLeft="75dp"
             tools:layout_constraintTop_creator="1"
             android:layout_marginStart="75dp"
-            app:layout_constraintTop_toBottomOf="@+id/name"
-            android:layout_marginTop="0dp" />
+            app:layout_constraintTop_toBottomOf="@+id/name" />
 
 
 </android.support.constraint.ConstraintLayout>
