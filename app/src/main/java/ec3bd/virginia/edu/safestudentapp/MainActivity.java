@@ -29,6 +29,19 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCamera();           // Stop camera on pause
+        setContentView(R.layout.activity_main);
+    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
+//        mScannerView.startCamera();          // Start camera on resume
+//    }
+
+    @Override
     public void handleResult(Result rawResult) {
         // request to server with info from scan + gps + settings/name of device
 
@@ -44,21 +57,7 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
         alert1.show();
 
         // If you would like to resume scanning, call this method below:
-         mScannerView.resumeCameraPreview(this);
+        mScannerView.resumeCameraPreview(this);
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mScannerView.stopCamera();           // Stop camera on pause
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();          // Start camera on resume
-    }
-
-
 
 }
