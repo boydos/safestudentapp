@@ -60,6 +60,8 @@
         tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="104dp" />
+        android:layout_marginBottom="104dp"
+        android:onClick="QrScanner" />
+
 
 </android.support.constraint.ConstraintLayout>
