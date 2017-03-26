@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 
 import com.google.zxing.Result;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
@@ -44,6 +45,9 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
     @Override
     public void handleResult(Result rawResult) {
         // request to server with info from scan + gps + settings/name of device
+        CheckBox checkin = (CheckBox)findViewById(R.id.checkBox3);
+        CheckBox checkout = (CheckBox)findViewById(R.id.checkBox);
+        
 
 
         Log.e("handler", rawResult.getText());
