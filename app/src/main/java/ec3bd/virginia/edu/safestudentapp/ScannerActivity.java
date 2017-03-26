@@ -66,7 +66,6 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
 
     @Override
     public void handleResult(Result rawResult) {
-        // request to server with info from scan + gps + settings/name of device
 
 
         Log.e("handler", rawResult.getText());
