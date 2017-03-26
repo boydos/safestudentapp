@@ -151,19 +151,7 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
                         Log.d("Error.Response", error.toString());
                     }
                 }
-        ) {
-//            @Override
-//            protected JSONObject getParams()
-//            {
-//                Map<String, String>  params = new HashMap<String, String>();
-//                params.put("uuid", student_id);
-//                params.put("scanner_name", name);
-//                params.put("latitude", lat);
-//                params.put("longitude", lon);
-//                JSONObject json = new JSONObject(params);
-//                return json;
-//            }
-        };
+        ) {};
         queue.add(postRequest);
     }
 }
