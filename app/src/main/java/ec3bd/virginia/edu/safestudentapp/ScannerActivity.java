@@ -132,7 +132,7 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
             protected Map<String, String> getParams()
             {
                 Map<String, String>  params = new HashMap<String, String>();
-                params.put("student_id", student_id);
+                params.put("uuid", student_id);
                 params.put("scanner_name", name);
                 params.put("latitude", lat);
                 params.put("longitude", lon);
