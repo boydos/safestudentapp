@@ -1,5 +1,6 @@
 package ec3bd.virginia.edu.safestudentapp;
 
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
@@ -25,7 +26,22 @@ public class MainActivity extends ActionBarActivity implements ZXingScannerView.
         setContentView(mScannerView);
 
         mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();         // Start camera
+
+        int backCameraId = -1, frontCameraId = -1;
+        for(int i=0;i<Camera.getNumberOfCameras();i++){
+            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+            Camera.getCameraInfo(i,cameraInfo);
+            if(cameraInfo.facing== Camera.CameraInfo.CAMERA_FACING_BACK) {
+                backCameraId = i;
+            }
+            if(cameraInfo.facing== Camera.CameraInfo.CAMERA_FACING_FRONT){
+                frontCameraId = i;
+            }
+        }
+        int camera = backCameraId;
+        if(backCameraId == -1)
+            camera = frontCameraId;
+        mScannerView.startCamera(camera);         // Start camera
 
     }
 
