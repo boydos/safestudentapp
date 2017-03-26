@@ -30,8 +30,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void QrScanner(View view){
         Intent intent = new Intent(this, ScannerActivity.class);
-        //EditText editText = (EditText) findViewById(R.id.name);
-        //String name = editText.getText().toString();
+        EditText editText = (EditText) findViewById(R.id.name);
+        String name = editText.getText().toString();
         intent.putExtra("name", "testName");
         startActivity(intent);
     }

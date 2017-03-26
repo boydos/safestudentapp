@@ -9,16 +9,32 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.zxing.Result;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class ScannerActivity extends ActionBarActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
+    private String student_id;
+    private String scanner_name;
+    private double latitude = 0;
+    private double longitude = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
+        Bundle bundle = getIntent().getExtras();
+        scanner_name = bundle.getString("name");
 
         mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view
         setContentView(mScannerView);
@@ -78,5 +94,50 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
             }
         },750L);
 
+        // Get the student id
+        this.student_id = rawResult.getText();
+
+        //Send data through to server
+        this.sendData();
+    }
+
+    public void sendData() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        final String url = "http://safestudent.herokuapp.com/api/v1/event/create";
+        final String name = this.scanner_name;
+        final String lat = ""+this.latitude;
+        final String lon = ""+this.longitude;
+        final String student_id = this.student_id;
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.d("Response", response);
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.d("Error.Response", error.toString());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("student_id", student_id);
+                params.put("scanner_name", name);
+                params.put("latitude", lat);
+                params.put("longitude", lon);
+
+                return params;
+            }
+        };
+        queue.add(postRequest);
     }
 }
