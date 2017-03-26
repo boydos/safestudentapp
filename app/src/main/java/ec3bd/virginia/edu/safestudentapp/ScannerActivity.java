@@ -3,6 +3,7 @@ package ec3bd.virginia.edu.safestudentapp;
 import android.app.AlertDialog;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
+import android.location.Location;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -66,7 +67,9 @@ public class ScannerActivity extends ActionBarActivity implements ZXingScannerVi
 
     @Override
     public void handleResult(Result rawResult) {
-
+        GPSTracker gps = new GPSTracker(this);
+        latitude = gps.getLatitude();
+        longitude = gps.getLongitude();
 
         Log.e("handler", rawResult.getText());
         Log.e("handler", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode)
